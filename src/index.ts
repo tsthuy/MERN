@@ -1,4 +1,5 @@
 import express from 'express';
+import { Request, Response, NextFunction } from 'express'
 import http from 'http'
 import bodyParser from 'body-parser'
 import cookieParser from 'cookie-parser'
@@ -7,6 +8,7 @@ import cors from 'cors'
 import mongoose from 'mongoose';
 import dotenv from 'dotenv'
 import authRouter from './routes/auth.route'
+import { Logger } from 'typescript-logger';
 dotenv.config();
 const app =  express();
 
@@ -39,3 +41,15 @@ app.get('/' , (req, res) =>{
 })
 app.use('/api/auth', authRouter)
 
+app.use((err: any, req: Request, res: Response, next: NextFunction) => {
+//   console.error(err); // Use the Error object
+
+  const statusCode = err.statusCode || 500;
+  const message = err.message || 'Internal Server Error';
+
+  return res.status(statusCode).json({
+    success: false,
+    statusCode,
+    message,
+  });
+});
